@@ -5,12 +5,13 @@ from src.controller import ctrl_event
 
 app = Flask(__name__)
 
-@app.route("/api/event", methods=["GET, POST, PUT, DELETE"])
+@app.route("/api/event", methods=["GET", "POST", "PUT", "DELETE"])
 def event():
 
     try:
         if request.method == 'GET':
-            ctrl_event.get()
+            result = ctrl_event.get()
+            return jsonify(result)
         
         if request.method == 'POST':
             ctrl_event.update()
@@ -20,6 +21,8 @@ def event():
 
         if request.method == 'DELETE':
             ctrl_event.delete()
-
+        
+        return jsonify('PERFECT :D')
     except Exception as e:
-        pass
+        print(e)
+        return jsonify(str(e))
