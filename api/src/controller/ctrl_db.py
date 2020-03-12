@@ -22,3 +22,12 @@ def update_item():
 
 def delete_item():
     pass
+
+
+def is_item(tablename, primary_keys):
+    sqlobject = SQLObjClass[tablename]
+    res = db_session.query(sqlobject).filter_by(**primary_keys).first()
+    if res:
+        return True
+    else:
+        return False
