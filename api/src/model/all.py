@@ -1,5 +1,9 @@
 from src.model.Event import Event
+from enum import Enum
 
-SQLOBJECTS = {
-    'event': Event
+class SQLObj(Enum):
+    event = 'event'
+
+SQLObjClass = {
+    SQLObj.event: Event
 }
