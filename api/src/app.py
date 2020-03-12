@@ -17,9 +17,14 @@ def event():
         
         if request.method == 'DELETE':
             # TODO: Get parameters
-            ctrl_event.delete()
+            event_id = request.args.get('id')
+            res = ctrl_event.delete(event_id)
+            if res:
+                return jsonify('Resource correctly deletc'), 200
+            return responses.unexpected_error()
 
         body = request.json
+
         # Check parameters
         required_param = ['title', 'initdate', 'enddate']
         missed_param = []
@@ -28,16 +33,25 @@ def event():
                 missed_param.append(missed_param)
         if len(missed_param):
             return responses.bad_parameters(missed_param)
-        
+
+        # Format type variables
+        body['initdate'] = ctrl_event.to_datetime(body['initdate'])
+        body['enddate'] = ctrl_event.to_datetime(body['enddate'])
+
         if request.method == 'POST':
-            ctrl_event.create(body)
+            res = ctrl_event.create(body)
+            if res:
+                return responses.correctly_created()
+            else:
+                return responses.unexpected_error()
         
         if request.method == 'PUT':
-            ctrl_event.update()
+            res = ctrl_event.update(body)
+            if res:
+                return responses.correctly_updated()
+            else:
+                return responses.unexpected_error()
 
-
-        
-        return jsonify('PERFECT :D')
     except Exception as e:
         print(e)
         return jsonify(str(e))

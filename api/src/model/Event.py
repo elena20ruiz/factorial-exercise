@@ -20,14 +20,6 @@ class Event(Base):
             if not (c.name in parameters):
                 continue
             value = parameters[c.name]
-            # Date case
-            if c.type.python_type == datetime.date:
-                dates = value.split('-')
-                value = datetime.date(
-                    int(dates[0]),
-                    int(dates[1]),
-                    int(dates[2])
-                )
             setattr(self, c.name, value)
 
 
@@ -35,6 +27,6 @@ class Event(Base):
         return dict(
             title = self.title,
             description = self.description,
-            initDate = self.initDate,
-            endDate = self.endDate
+            initDate = self.initdate,
+            endDate = self.enddate
         )
