@@ -3,25 +3,23 @@ from flask import Flask, request, jsonify
 from src.db import sqlalchemy
 from src.controller import ctrl_event
 
-from src.util import responses
+from src.responses import responses, r_event
 
 app = Flask(__name__)
 
 @app.route("/api/event", methods=["GET", "POST", "PUT", "DELETE"])
 def event():
-
     try:
         if request.method == 'GET':
             result = ctrl_event.get()
-            return jsonify(result)
+            return jsonify(result), 200
         
         if request.method == 'DELETE':
-            # TODO: Get parameters
             event_id = request.args.get('id')
-            res = ctrl_event.delete(event_id)
-            if res:
-                return jsonify('Resource correctly deletc'), 200
-            return responses.unexpected_error()
+            error = ctrl_event.delete(event_id)
+            if not error:
+                return responses.correctly_deleted()
+            return r_event.get_error_msg(error)
 
         body = request.json
 
@@ -35,23 +33,20 @@ def event():
             return responses.bad_parameters(missed_param)
 
         # Format type variables
-        body['initdate'] = ctrl_event.to_datetime(body['initdate'])
-        body['enddate'] = ctrl_event.to_datetime(body['enddate'])
+        body['initdate'] = ctrl_serialize.to_datetime(body['initdate'])
+        body['enddate'] = ctrl_serialize.to_datetime(body['enddate'])
 
         if request.method == 'POST':
-            res = ctrl_event.create(body)
-            if res:
+            error = ctrl_event.create(body)
+            if not error:
                 return responses.correctly_created()
-            else:
-                return responses.unexpected_error()
+            return r_event.get_error_msg(error)
         
         if request.method == 'PUT':
-            res = ctrl_event.update(body)
-            if res:
+            error = ctrl_event.update(body)
+            if not error:
                 return responses.correctly_updated()
-            else:
-                return responses.unexpected_error()
+            return r_event.get_error_msg(error)
 
     except Exception as e:
-        print(e)
-        return jsonify(str(e))
+        return responses.unexpected_error()

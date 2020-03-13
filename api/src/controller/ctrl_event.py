@@ -1,51 +1,53 @@
 import datetime
 from src.controller import ctrl_db, ctrl_serialize
 from src.model.all import SQLObj
-
+from src.errors.APIerrors import EventErrors
 def get():
     result = ctrl_db.get_all(SQLObj.event)
     return ctrl_serialize.all(result)
 
 def create(parameters):
     try:
-        res = ctrl_db.create_item(SQLObj.event, parameters)
-        if res:
-            return True 
-        return False
+        # Check if not exists
+        original_obj = ctrl_db.get_item(SQLObj.event, {'id': parameters['id']})
+        if original_obj:
+            return EventErrors.already_exists
+
+        # Create
+        created = ctrl_db.create_item(SQLObj.event, parameters)
+        if created:
+            return False 
+
+        return EventErrors.precondition
     except Exception as e:
-        return False
+        return EventErrors.unexpected
 
 def update(parameters):
     try:
         # Check if exists
         original_obj = ctrl_db.get_item(SQLObj.event, {'id': parameters['id']})
+        if not original_obj:
+            return EventErrors.not_exists
+
         # Step 2: Update it
         if original_obj:
-            res = ctrl_db.update_item(original_obj, parameters)
-            return True
-        else:
-            return False
+            updated = ctrl_db.update_item(original_obj, parameters)
+            if updated:
+                return False
+        return EventErrors.precondition
     except Exception as e:
-        return False
+        return EventErrors.unexpected
 
 def delete(event_id):
     try:
         # Check if exists
         original_obj = ctrl_db.get_item(SQLObj.event, {'id': int(event_id)})
         if not original_obj:
+            return EventErrors.not_exists
+        deleted = ctrl_db.delete_item(SQLObj.event, {'id': int(event_id)})
+        if deleted:
             return False
-        res = ctrl_db.delete_item(SQLObj.event, {'id': int(event_id)})
-        if res:
-            return True
+        else:
+            return EventErrors.precondition
     except Exception as e:
-        return False
-
-
-def to_datetime(value):
-    dates = value.split('-')
-    value = datetime.date(
-        int(dates[0]),
-        int(dates[1]),
-        int(dates[2])
-    )
-    return value
+        return EventErrors.unexpected

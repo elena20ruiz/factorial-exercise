@@ -1,12 +1,12 @@
 import datetime
-from sqlalchemy import Column, Integer, String, Date, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Date, UniqueConstraint, Sequence
 from src.db.sqlalchemy import Base
 
 
 
 class Event(Base):
     __tablename__ = 'events'
-    id = Column('id',Integer, primary_key=True)
+    id = Column('id',Integer, Sequence('events_id_seq'), primary_key=True)
     title = Column('title',String(50), nullable=False)
     description = Column('description', String(500))
     initdate = Column('initdate', Date, nullable=False)
@@ -25,6 +25,7 @@ class Event(Base):
 
     def serialize(self):
         return dict(
+            id = self.id,
             title = self.title,
             description = self.description,
             initDate = self.initdate,

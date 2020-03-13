@@ -10,5 +10,12 @@ def correctly_created():
 def correctly_updated():
     return jsonify('Resource correctly updated'), 200
 
+def correctly_deleted():
+    return jsonify('Resource correctly deleted'), 200
+
 def unexpected_error():
     return jsonify('Unexpected error'), 200
+
+def precondition_failed(reason):
+    return jsonify(f'Precondition failed: {reason}'), 200
+
