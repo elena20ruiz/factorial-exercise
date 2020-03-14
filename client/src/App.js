@@ -1,21 +1,61 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
-        </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
+import { Grid, Fab } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import AddIcon from '@material-ui/icons/Add';
+
+import './App.css';
+import EventList from './components/EventList/EventList';
+import EventCard from './components/EventCard/EventCard';
+
+const useStyles = makeStyles(theme => ({
+  left: {
+    padding: '2em',
+    height: 'inherit'
+  },
+  right: {
+    padding: '2em'
+  },
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    height: '100%',
+    '& > *': {
+      display: 'flex'
+    }
+  },
+  addButton: {
+    margin: '0 auto',
+    marginRight: '2em'
   }
+}));
+
+
+function App() {
+  const classes = useStyles();
+    return (
+      <Grid container
+            direction="row" 
+            className="App"
+      >
+        <Grid className={classes.left} item xs={6}>
+          <EventList />
+        </Grid>
+        <Grid className={classes.right} item xs={6}>
+          <div className={classes.container}>
+            <div>
+              <EventCard />
+            </div>
+            <div>
+              <Fab className={classes.addButton} color="primary" aria-label="add" >
+                <AddIcon />
+              </Fab>
+            </div>
+          </div>
+        </Grid>
+      </Grid>
+    );
 }
 
 export default App;
