@@ -4,8 +4,11 @@ from src.db import sqlalchemy
 from src.controller import ctrl_event
 
 from src.responses import responses, r_event
+from flask_cors import CORS
+
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/api/event", methods=["GET", "POST", "PUT", "DELETE"])
 def event():
