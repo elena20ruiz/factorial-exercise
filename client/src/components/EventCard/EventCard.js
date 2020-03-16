@@ -1,6 +1,7 @@
 import React from 'react';
-import { Card, makeStyles, CardContent, Typography, CardActions, Fab, IconButton } from '@material-ui/core';
+import { Card, makeStyles, CardContent, Typography, CardActions, IconButton } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
 import QueryBuilderIcon from '@material-ui/icons/QueryBuilder';
 import WatchLaterIcon from '@material-ui/icons/WatchLater';
 
@@ -20,15 +21,15 @@ const useStyles = makeStyles({
       transform: 'scale(0.8)',
     },
     title: {
-      fontSize: 16,
+      fontSize: '16',
     },
     subtitle: {
-        fontSize: 12,
+        fontSize: '12',
         display: 'flex',
         margin: '0.3em'
     },
-    bottom: {
-        marginBottom: 12,
+    cardBottom: {
+        marginBottom: '12px',
     },
     button: {
         margin: '0 auto',
@@ -39,25 +40,36 @@ const useStyles = makeStyles({
 function EventCard(props) {
     const classes = useStyles();
 
+
+    function renderDate(dateS) {
+        const dateSS = dateS.split(' ');
+        var result = "";
+        for(var i = 0; i < 4; ++i) {
+            result += dateSS[i] + " ";
+        }
+        return result;
+    }
+
     return (
         <Card className={classes.root}  variant="outlined">
             <CardContent>
             <Typography className={classes.title} color="textSecondary" gutterBottom>
-                Word of the Day
+                {props.element["title"]}
             </Typography>
-            <Typography className={classes.subtitle} color="textSecondary" gutterBottom>
-                <QueryBuilderIcon  fontSize="small" /> Init date
+            <Typography className={classes.subtitle} variant="body2"  color="textSecondary" gutterBottom>
+                <QueryBuilderIcon  fontSize="small" /> {renderDate(props.element["initDate"])}
             </Typography>
-            <Typography className={classes.subtitle} color="textSecondary" gutterBottom>
-                <WatchLaterIcon fontSize="small" /> End date
+            <Typography className={classes.subtitle} variant="body2" color="textSecondary" gutterBottom>
+                <WatchLaterIcon fontSize="small" /> {renderDate(props.element["endDate"])}
             </Typography>
             <Typography variant="body2" component="p">
-                well meaning and kindly.
-                <br />
-                {'"a benevolent smile"'}
+                {props.element["description"]}
             </Typography>
             </CardContent>
-            <CardActions classes={classes.bottom}>
+            <CardActions className={classes.cardBottom}>
+                <IconButton className={classes.button}>
+                    <DeleteIcon />
+                </IconButton>
                 <IconButton className={classes.button}>
                     <EditIcon />
                 </IconButton>

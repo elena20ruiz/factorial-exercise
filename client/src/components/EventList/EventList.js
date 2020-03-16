@@ -1,6 +1,6 @@
 import React from 'react';
 import EventItem from '../EventItem/EventItem';
-import { makeStyles, Grid } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
 
 
 const useStyles = makeStyles(theme => ({
@@ -9,23 +9,51 @@ const useStyles = makeStyles(theme => ({
         height: 'inherit'
     },
     element: {
+        textAlign: 'left',
         maxWidth: '25em',
         margin: '0 auto',
         marginRight: '0.3em',
         paddingTop: '0.25em',
         paddingBottom: '0.25em'
+    },
+    selectCard: {
+        cursor: 'pointer'
     }
 }));
 
-function EventList() {
+function EventList(props) {
     const classes = useStyles();
+    const [currentKey, setCurrentKey] = React.useState(0);
+    const [selectedItems, setSelectedItems] = React.useState(
+        new Array(props.elements.length).fill(false)
+    );
+
+    function handleClick(e) {
+        var key = e.currentTarget.getAttribute('data-id');
+        selectedItems[currentKey] = false;
+        selectedItems[key] = true;
+        setCurrentKey(key);
+        setSelectedItems(selectedItems);
+        props.handleSelected(key);
+    }
 
     function renderItems() {
         var output = [];
-        for(var i = 0; i < 10; ++i) {
+        for(var i = 0; i < props.elements.length; ++i) {
             output.push(
-                <div className={classes.element}>
-                    <EventItem title="Doctor" description="You have to go to doctor" />
+                <div className={classes.element} key={i}>
+                    <a className={classes.selectCard}
+                        data-id={i}
+                        onClick={(e) => handleClick(e)}
+                    >
+                        <EventItem 
+                            title={ props.elements[i]["title"]}
+                            description={ props.elements[i]["description"]}
+                            initDate={ props.elements[i]["initDate"]}
+                            endDate={ props.elements[i]["endDate"]}
+                            selected={selectedItems[i]}
+                        />
+                    </a>
                 </div>
             )
         }
