@@ -36,7 +36,12 @@ const add = function(data) {
         axios({
             method: 'post',
             url: URL + ENDPOINT,
-            data: data
+            data: {
+                'title': data['title'],
+                'description': data['description'],
+                'initdate': data['initDate'],
+                'enddate': data['endDate']
+            }
         })
         .then((res)=> {
             if(res.statusText === 'OK') {
@@ -63,7 +68,13 @@ const edit = function(data) {
         axios({
             method: 'put',
             url: URL + ENDPOINT,
-            data: data
+            data: {
+                'id': data['id'],
+                'title': data['title'],
+                'description': data['description'],
+                'initdate': data['initDate'],
+                'enddate': data['endDate']
+            }
         })
         .then((res)=> {
             if(res.statusText === 'OK') {

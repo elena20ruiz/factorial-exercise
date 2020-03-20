@@ -1,112 +1,116 @@
 import React from 'react';
-
-import { Grid, Fab } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
-import AddIcon from '@material-ui/icons/Add';
-
-import './App.css';
-import EventList from './components/EventList/EventList';
-import EventCard from './components/EventCard/EventCard';
 import ApiFactory from './api/ApiFactory';
+import EventList from './components/List/EventList';
+import { makeStyles, Grid, Container } from '@material-ui/core';
+import FloatingButton from './components/Button/FloatingButton';
+import ModalEvent from './components/Modal/ModalEvent';
 
-const styles = (theme => ({
-  left: {
-    padding: '2em',
-    height: 'inherit'
-  },
-  right: {
-    padding: '2em'
+const useStyles = makeStyles(theme => ({
+  root: {
+    display: 'flex',
+    justifyContent: 'center'
   },
   container: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    height: '100%',
-    '& > *': {
-      display: 'flex'
-    }
-  },
-  addButton: {
     margin: '0 auto',
-    marginRight: '2em'
+    margin: '2em',
+  },
+  modal: {
+    width: '20em',
+    height: '20em'
+  },
+  eventList: {
+    height: '40em'
+  },
+  floatingButton: {
+    position: 'absolute',
+    right: '2em',
+    bottom: '2em'
   }
 }));
 
 
-class App extends React.Component {
 
-  constructor(props) {
-    super(props);
+function App() {
+  const classes = useStyles();
+  const [elements, setElements] = React.useState([]);
+  const [error, setError] = React.useState(false);
+  const [modal, setModal] = React.useState(false);
+  const [modalAction, setModalAction] = React.useState('edit');
+  const [currentElement, setCurrentElement] = React.useState(0);
+  React.useEffect(() => {
+    getElements();
+  }, []);
 
-    this.state = {
-      loading: true,
-      elements: [],
-      selected: undefined 
-    }
-
-    this.handleAdd = this.handleAdd.bind(this);
-    this.handleSelected = this.handleSelected.bind(this);
-  }
-
-  componentWillMount() {
+  function getElements() {
     const getEvents = ApiFactory.get('getEvents');
     getEvents()
-      .then((res) => {
-        this.setState({
-          elements: res,
-          loading: false
-        });
+      .then((elements) => {
+        setElements(elements);
+        setError(false);
       })
-      .catch((err) => {
+      .catch((res) => {
+        setError(res);
+      })
+  }
+
+  function handleCloseModal() {
+    getElements();
+    setModal(false);
+    setModalAction(undefined);
+  }
+
+  function handleEdit(eventPos) {
+    setModal(true);
+    setModalAction('edit');
+    setCurrentElement(eventPos)
+  }
+
+  function handleDelete(pos) {
+    const deleteF = ApiFactory.get('deleteEvent');
+    deleteF(elements[pos]['id'])
+      .then(()  => {
+        getElements()
+      })
+      .catch((err)=> {
         // Show error
       })
   }
 
-  handleAdd() {
 
-  }
-
-  handleSelected(eventId) {
-    console.log('selected:' + eventId);
-    this.setState({selected: eventId});
-  }
-
-  render() {
-    if(this.state.loading) {
-
-      return (<p>loading...</p>)
+  function handleAdd(){
+    setModal(true);
+    setModalAction('add');
+    var e = {
     }
-    return (
-      <Grid container
-            direction="row" 
-            className="App"
-      >
-        <Grid className={this.props.classes.left} item xs={6}>
-          <EventList 
-            elements={this.state.elements} 
-            handleSelected={(eventId)=> this.handleSelected(eventId)}
-          />
-        </Grid>
-        <Grid className={this.props.classes.right} item xs={6}>
-          <div className={this.props.classes.container}>
-            <div>
-              {
-                this.state.selected !== undefined &&
-                <EventCard
-                  element = {this.state.elements[this.state.selected]}
-                />
-              }
-            </div>
-            <div>
-              <Fab className={this.props.classes.addButton} color="primary" aria-label="add" >
-                <AddIcon />
-              </Fab>
-            </div>
-          </div>
-        </Grid>
-      </Grid>
-    )
+    var elem = elements;
+    elem.push(e);
+    setElements(elem);
   }
+
+  return (
+    <div className={classes.root}>
+      {
+        (modal && elements.length) &&
+          <ModalEvent
+            element={elements[currentElement]}
+            action={modalAction} 
+            onClose={() => handleCloseModal()}/>
+      }
+      <Container fixed maxWidth="sm" className={classes.container}>
+        <div className={classes.eventList}>
+          <EventList
+            onEdit = {(e) => handleEdit(e)}
+            onDelete = {(e) => handleDelete(e)}
+            elements={elements} />
+        </div>
+
+      </Container>
+      <div className={classes.floatingButton}>
+        <FloatingButton onClick={()=>handleAdd()}/>
+      </div>
+    </div>
+
+  );
 }
 
-export default withStyles(styles)(App);
+export default App;
