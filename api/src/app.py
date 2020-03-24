@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 
 from src.db import sqlalchemy
-from src.controller import ctrl_event
+from src.controller import ctrl_event, ctrl_serialize
 
 from src.responses import responses, r_event
 from flask_cors import CORS

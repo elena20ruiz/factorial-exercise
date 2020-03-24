@@ -8,8 +8,12 @@ def get():
 
 def create(parameters):
     try:
-        # Check if not exists
-        original_obj = ctrl_db.get_item(SQLObj.event, {'id': parameters['id']})
+        # Check if is repeated
+        original_obj = ctrl_db.get_item(SQLObj.event, {
+                'title': parameters['title'], 
+                'initdate': parameters['initdate'], 
+                'enddate': parameters['enddate']
+            })
         if original_obj:
             return EventErrors.already_exists
 
