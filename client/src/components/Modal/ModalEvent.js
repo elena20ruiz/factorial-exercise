@@ -80,6 +80,17 @@ function ModalEvent(props) {
             return;
         }
 
+        // Check lenght
+        if (element.title.length > 50) {
+            setError('Title has to be lower that 50 characters');
+            return;
+        }
+
+        if (element.description.length > 500) {
+            setError('Description has to be lower that 500 characters');
+            return;
+        }
+
         var f;
         if (props.action == 'add') f = 'addEvent';
         else f = 'updateEvent';
@@ -159,6 +170,8 @@ function ModalEvent(props) {
                         InputLabelProps={{
                             shrink: true,
                         }}
+                        multiline
+                        rows={5}
                     />
                 </form>
             </DialogContent>
